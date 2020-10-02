@@ -7,6 +7,7 @@ module Vertices
   # Main class, which handles the entire game world by exposing update/render
   class Game
 
+    include Ahnlak::MixinSerializable
     attr_accessor :args
 
     # Constructor, which creates the basic world
@@ -16,10 +17,46 @@ module Vertices
       @args = args
 
       # On startup we're not running
-      @running = false
+      @args.state.vertices.running = false
 
-      # Initialise some other bits
+      # Set some basic game parameters
+      @args.state.vertices.play_ticks = 10.seconds
+
+      # Initialise some other bits - again, set some defaults
       @prompt = []
+      @prompt << TintedLabel.new(
+        visible: true,
+        x: @args.grid.center_x, y: 400,
+        alignment_enum: 1, size_enum: 15,
+        text: 'Click on the shape with the fewest edges',
+        font: 'fonts/Kenney Future Square.ttf'
+      )
+      @prompt << TintedLabel.new(
+        visible: true,
+        x: @args.grid.center_x, y: 325,
+        alignment_enum: 1, size_enum: 15,
+        text: 'How many can you click in time?!',
+        font: 'fonts/Kenney Future Square.ttf'
+      )
+      @prompt.each do |prompt|
+        prompt.colourable_cycle(
+          [
+            [255, 255, 255, 255],
+            [100, 255, 100, 255],
+            [255, 100, 255, 255]
+          ],
+          30
+        )
+      end
+
+      # And load up our sprites
+      load_sprites
+
+    end
+
+
+    # Load up the sprites which will always be used
+    def load_sprites
 
       # Sort out the logo that we'll use when it's required
       @logo_sprite = TintedSprite.new(w: 567, h: 135, path: 'sprites/logo.png')
@@ -31,8 +68,29 @@ module Vertices
           [0, 10, 255, 255],
           [50, 10, 205, 255],
           [205, 10, 50, 255]
-        ],
-        20
+        ], 15
+      )
+      @logo_sprite.movable_location_cycle(
+        [
+          [(@args.grid.w - 547) / 2, 480],
+          [(@args.grid.w - 567) / 2, 520],
+          [(@args.grid.w - 587) / 2, 500],
+          [(@args.grid.w - 567) / 2, 480],
+          [(@args.grid.w - 547) / 2, 500],
+          [(@args.grid.w - 567) / 2, 520],
+          [(@args.grid.w - 587) / 2, 480],
+          [(@args.grid.w - 567) / 2, 500]
+        ], 60
+      )
+
+      # And the start button
+      @button_sprite = TintedSprite.new(w: 256, h: 64, path: 'sprites/start.png')
+      @button_sprite.movable_location((@args.grid.center_x - 128), 128)
+      @button_sprite.colourable_cycle(
+        [
+          [255, 255, 255, 255],
+          [128, 128, 128, 255]
+        ], 10
       )
 
     end
@@ -41,37 +99,97 @@ module Vertices
     # Update the world
     def update
 
-      # So, if we're running we (a) count down,(b) check we have enough shapes,
-      # and (c) see if the user clicks on one of them
-      if @running
+      # Call the appropriate updater, depending on what mode we're in
+      if @args.state.vertices.running
 
-        # See if we have any time left!
+        update_running
 
-
-      # If we're not running, we're just prompting the user and waiting for
-      # her to click the start button
       else
 
-        # Update the logo sprite
-        @logo_sprite.set_location((@args.grid.w - 567) / 2, 500)
-        @logo_sprite.colourable_update
+        update_title
 
-        # Set the correct prompt to show, either the last score of just general
-        @prompt[0] = 'Click on the shape with the fewest edges'
-        @prompt[1] = 'How many can you click in time?!'
+      end
 
-        # And see if the user clicks on the button
+    end
+
+    # Handles updates when we are running
+    def update_running
+
+      # So, if we're running we (a) count down,(b) check we have enough shapes,
+      # and (c) see if the user clicks on one of them
+
+      # (a) count down, and handle if we're out of time
+      if @args.tick_count > @args.state.vertices.start_tick + @args.state.vertices.play_ticks
+
+        # Update the prompts to record the total count of objects
+        @prompt[0].text = "You managed to click on #{@args.state.vertices.shape_count} shapes!"
+        @prompt[1].text = 'Can you get click on even more?!'
+
+        # And stop the running state
+        @args.state.vertices.running = false
+
+      end
+
+      # (b) work out how many shapes we should have, and if we don't have enough
+      # then spawn some more
+      shape_count = (3 + (@args.tick_count - @args.state.vertices.start_tick) / 180).to_i
+      puts shape_count
+
+    end
+
+    # Handle updates when we're at the title screen
+    def update_title
+
+      # Update the logo sprite
+      @logo_sprite.update
+
+      # And the prompt label(s)
+      drift_x = @args.grid.center_x + 15.randomize(:sign)
+      drift_y = 400 + 5.randomize(:sign)
+
+      @prompt.each_with_index do |label, idx|
+
+        # If we're stationary, pick a new random location to drift to
+        label.movable_location(drift_x, drift_y - (idx * 75), 30) unless label.movable_moving?
+
+        # And lastly, update it
+        label.update
+
+      end
+
+      # And see if the user clicks on the button
+      @button_sprite.update
+      if @args.inputs.mouse.click &&
+         @args.inputs.mouse.click.point.x.between?(@args.grid.center_x - 128, @args.grid.center_x + 128) &&
+         @args.inputs.mouse.click.point.y.between?(128, 192)
+
+        # Set the timer running from this point
+        @args.state.vertices.start_tick = @args.tick_count
+
+        # Set the shape count to zero
+        @args.state.vertices.shape_count = 0
+
+        # And flag ourselves as running
+        @args.state.vertices.running = true
 
       end
 
     end
 
 
+
     # Render the world
     def render
 
       # If we're running, we show the count down and draw the shaps
-      if @running
+      if @args.state.vertices.running
+
+        # Draw the timer band across the top of the screen, as a solid
+        column = (@args.grid.w / @args.state.vertices.play_ticks) * (@args.tick_count - @args.state.vertices.start_tick)
+        @args.outputs.solids << {
+          x: 0, y: @args.grid.top - 10, w: column, h: 10,
+          r: 255, g: 10, b: 10, a: 255
+        }
 
       # If not, we just show the splash/prompt screen
       else
@@ -79,18 +197,11 @@ module Vertices
         # So, draw the logo
         @args.outputs.sprites << @logo_sprite
 
-        # And the prompting blurb
-        @prompt.each_with_index do |prompt, index|
-          @args.outputs.labels << {
-            x: @args.grid.center_x, y: 400 - (index * 75),
-            text: prompt,
-            alignment_enum: 1, size_enum: 15,
-            r: 200, g: 200, b: 200, a: 255,
-            font: 'fonts/Kenney Future Square.ttf'
-          }
-        end
+        # And work through the prompts, spacing them slightly sensibly
+        @prompt.each { |prompt| @args.outputs.labels << prompt }
 
         # Lastly the button to be pressed
+        @args.outputs.sprites << @button_sprite
 
       end
 

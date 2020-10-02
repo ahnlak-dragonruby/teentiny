@@ -24,13 +24,23 @@ Layout/EmptyLinesAroundBlockBody:
 Layout/EmptyLineBetweenDefs:
   Enabled: false
 
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: false
+
 # Actually, those aren't redundant in DragonRuby
 Style/RedundantFileExtensionInRequire:
   Enabled: false
 
+# We will also sometimes need to refer to a global...
+Style/GlobalVars:
+  AllowedVariables: [$gtk]
+
 # Boy, rubocop really does have some low complexity thresholds
 Metrics/AbcSize:
   Max: 50
+
+Metrics/ClassLength:
+  Max: 250
 
 Metrics/MethodLength:
   Max: 100

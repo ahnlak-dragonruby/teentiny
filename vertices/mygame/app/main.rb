@@ -7,8 +7,10 @@
 # Copyright (c) 2020 Pete Favelle <dragonruby@ahnlak.com>
 
 require 'app/ahnlak/mixin_colourable.rb'
+require 'app/ahnlak/mixin_movable.rb'
 require 'app/ahnlak/mixin_serializable.rb'
 require 'app/game.rb'
+require 'app/tinted_label.rb'
 require 'app/tinted_sprite.rb'
 require 'app/vertices.rb'
 
