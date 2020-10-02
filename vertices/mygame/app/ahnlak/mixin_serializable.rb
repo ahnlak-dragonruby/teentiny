@@ -10,16 +10,15 @@
 
 module Ahnlak
 
+  # A mixin to add simple serialization to a class
   module MixinSerializable
 
     # The main serialization
     def serialize
 
       vars = { 'Class' => self.class.name }
-      instance_variables.each { |var|
-        vars[var] = instance_variable_get(var)
-      }
-      return vars
+      instance_variables.each { |var| vars[var] = instance_variable_get(var) }
+      vars
 
     end
 

@@ -4,6 +4,7 @@
 
 module Vertices
 
+  # Main class, which handles the entire game world by exposing update/render
   class Game
 
     attr_accessor :args
@@ -22,14 +23,14 @@ module Vertices
 
       # Sort out the logo that we'll use when it's required
       @logo_sprite = TintedSprite.new(w: 567, h: 135, path: 'sprites/logo.png')
-      @logo_sprite.colourable_cycle( 
+      @logo_sprite.colourable_cycle(
         [
-          [255,  10,   0, 255],
-          [205,  10,  50, 255],
-          [ 50,  10, 205, 255],
-          [  0,  10, 255, 255],
-          [ 50,  10, 205, 255],
-          [205,  10,  50, 255],
+          [255, 10, 0, 255],
+          [205, 10, 50, 255],
+          [50, 10, 205, 255],
+          [0, 10, 255, 255],
+          [50, 10, 205, 255],
+          [205, 10, 50, 255]
         ],
         20
       )
@@ -52,7 +53,7 @@ module Vertices
       else
 
         # Update the logo sprite
-        @logo_sprite.set_location((@args.grid.w-567)/2, 500)
+        @logo_sprite.set_location((@args.grid.w - 567) / 2, 500)
         @logo_sprite.colourable_update
 
         # Set the correct prompt to show, either the last score of just general
@@ -79,15 +80,15 @@ module Vertices
         @args.outputs.sprites << @logo_sprite
 
         # And the prompting blurb
-        @prompt.each_with_index { |prompt, index|
+        @prompt.each_with_index do |prompt, index|
           @args.outputs.labels << {
-            x: @args.grid.center_x, y: 400-(index*75),
+            x: @args.grid.center_x, y: 400 - (index * 75),
             text: prompt,
             alignment_enum: 1, size_enum: 15,
             r: 200, g: 200, b: 200, a: 255,
             font: 'fonts/Kenney Future Square.ttf'
           }
-        }
+        end
 
         # Lastly the button to be pressed
 

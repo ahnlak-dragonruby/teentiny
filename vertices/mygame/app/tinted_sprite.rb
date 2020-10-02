@@ -4,6 +4,7 @@
 
 module Vertices
 
+  # A lightweight wrapper around a DR sprite, adding in some utility mixins
   class TintedSprite
 
     # Pull in various mixins and attributes
@@ -16,22 +17,23 @@ module Vertices
     def initialize(**params)
 
       # Set some colour defaults
-      colourable( 255, 255, 255, 255, 0 )
+      colourable(255, 255, 255, 255, 0)
 
       # Store the parameters we find in our ivars
-      params.each { |key, value|
+      params.each do |key, value|
         instance_variable_set(key.to_s.prepend('@'), value)
-      }
+      end
 
     end
 
     # Location can either be set absolutely, or as a destination
-    def set_location(x, y)
-      @x = x
-      @y = y
+    def set_location(xxx, yyy)
+      @x = xxx
+      @y = yyy
     end
 
-    def set_destination(x, y, speed)
+    def set_destination(xxx, _yyy, _speed)
+      @x = xxx
     end
 
 

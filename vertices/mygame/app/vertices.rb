@@ -2,6 +2,8 @@
 #
 # This is the 'main' of the application, tucked away safely in our module
 
+# All code is wrapped inside the Vertices namespace; all main.rb needs to do
+# is to call into Vertices.tick each tick.
 module Vertices
 
   def self.init(args)
@@ -18,12 +20,10 @@ module Vertices
   def self.tick(args)
 
     # If we're not initialised, do so
-    if args.state.vertices.initialized != true
-      Vertices::init(args)
-    end
+    Vertices.init(args) if args.state.vertices.initialized != true
 
     # Set the basic screen parameters
-    args.outputs.background_color = [ 32, 0, 64, 255 ]
+    args.outputs.background_color = [32, 0, 64, 255]
 
     # Make sure the Game has an uptodate copy of args
     @game.args = args

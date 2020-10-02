@@ -1,0 +1,50 @@
+# Turn on all new cops, and make sure we ignore sample and tmp code
+AllCops:
+  Exclude:
+    - '*/samples/**/*'
+    - '*/tmp/**/*'
+  NewCops: enable
+
+# I like my white space, damnit!
+Layout/EmptyLines:
+  Enabled: false
+
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: false
+
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Layout/EmptyLineBetweenDefs:
+  Enabled: false
+
+# Actually, those aren't redundant in DragonRuby
+Style/RedundantFileExtensionInRequire:
+  Enabled: false
+
+# Boy, rubocop really does have some low complexity thresholds
+Metrics/AbcSize:
+  Max: 50
+
+Metrics/MethodLength:
+  Max: 100
+
+Metrics/CyclomaticComplexity:
+  Max: 25
+
+Metrics/PerceivedComplexity:
+  Max: 25
+
+# I'm not sure I even understand these ones
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+  

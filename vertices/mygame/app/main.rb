@@ -15,6 +15,6 @@ require 'app/vertices.rb'
 
 def tick(args)
 
-  Vertices::tick(args)
+  Vertices.tick(args)
 
 end
