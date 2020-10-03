@@ -20,7 +20,9 @@ module Vertices
       @args.state.vertices.running = false
 
       # Set some basic game parameters
-      @args.state.vertices.play_ticks = 10.seconds
+      @args.state.vertices.play_ticks ||= 10.seconds
+      @args.state.vertices.polygons ||= []
+      @polygons = []
 
       # Initialise some other bits - again, set some defaults
       @prompt = []
@@ -133,7 +135,31 @@ module Vertices
       # (b) work out how many shapes we should have, and if we don't have enough
       # then spawn some more
       shape_count = (3 + (@args.tick_count - @args.state.vertices.start_tick) / 180).to_i
-      puts shape_count
+      while @args.state.vertices.polygons.length < shape_count
+        @args.state.vertices.polygons << {
+          vertices: 3 + 7.randomize(:ratio).to_i
+        }
+      end
+
+      # We need to make sure that our polygon list reflects what's in the state
+      @args.state.vertices.polygons.each do |polygon|
+
+        # If we have a path defined, find it in our polygon list and update locations
+        if polygon.has_key?(:path)
+
+        # Then we need to create a new one
+        else
+
+          # Spawn it, and save the path of it
+          new_poly = RegularPolygon.new(args, 32, polygon[:vertices])
+          polygon[:path] = new_poly.path
+
+          # Finally add it to our internal list
+          @polygons << new_poly
+
+        end
+
+      end
 
     end
 
@@ -144,8 +170,8 @@ module Vertices
       @logo_sprite.update
 
       # And the prompt label(s)
-      drift_x = @args.grid.center_x + 15.randomize(:sign)
-      drift_y = 400 + 5.randomize(:sign)
+      drift_x = @args.grid.center_x + 15.randomize(:ratio, :sign)
+      drift_y = 400 + 5.randomize(:ratio, :sign)
 
       @prompt.each_with_index do |label, idx|
 
@@ -190,6 +216,9 @@ module Vertices
           x: 0, y: @args.grid.top - 10, w: column, h: 10,
           r: 255, g: 10, b: 10, a: 255
         }
+
+        # And draw each polygon
+        @args.outputs.sprites << @polygons
 
       # If not, we just show the splash/prompt screen
       else
