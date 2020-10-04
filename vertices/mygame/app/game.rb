@@ -57,6 +57,18 @@ module Vertices
     end
 
 
+    # Setter for args; needed to reflect args out to polygon sprites
+    def args=(args)
+
+      # Save the args reference
+      @args = args
+
+      # And echo that to the polygons
+      @polygons.each { |polygon| polygon.args = args }
+
+    end
+
+
     # Load up the sprites which will always be used
     def load_sprites
 
@@ -127,8 +139,15 @@ module Vertices
         @prompt[0].text = "You managed to click on #{@args.state.vertices.shape_count} shapes!"
         @prompt[1].text = 'Can you get click on even more?!'
 
+        # Clear out the active polygons
+        @args.state.vertices.polygons.clear
+        @polygons.clear
+
         # And stop the running state
         @args.state.vertices.running = false
+
+        # Skip the rest of the processing
+        return
 
       end
 
@@ -160,6 +179,9 @@ module Vertices
         end
 
       end
+
+      # And make sure we keep our polygon sprites updated
+      @polygons.each { |polygon| polygon.update }
 
     end
 

@@ -25,6 +25,7 @@ module Ahnlak
     def colourable_init_hashes
       @colourable_target ||= {}
       @colourable_delta ||= {}
+      @colourable_colours ||= []
     end
 
 
