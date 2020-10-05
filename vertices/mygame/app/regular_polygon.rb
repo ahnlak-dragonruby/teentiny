@@ -26,12 +26,15 @@ module Vertices
       colourable(55 + 200.randomize(:ratio), 155 + 100.randomize(:ratio), 55 + 200.randomize(:ratio), 255, 0)
 
       # Set our dimensions, based on the radius of the polygon
-      @source_x = @source_y = 0
+      @source_x = @source_y = @angle = 0
       @w = @h = @source_w = @source_h = radius * 2
       @path = "polygon#{object_id}"
 
       # Place us somewhere sensible
       movable_location((args.grid.w - @w).randomize(:ratio), (args.grid.h - @h - 10).randomize(:ratio))
+
+      # With an arbitray spin
+      movable_spin((30 + 60.randomize(:ratio)).randomize(:sign))
 
       # Create an appropriate render target
       args.render_target(@path).borders << { x: 0, y: 0, w: @w, h: @h, r: @r, g: @g, b: @b, a: 255 }
@@ -61,6 +64,9 @@ module Vertices
         when 3
           movable_location((args.grid.w - @w).randomize(:ratio), (args.grid.h - @h - 10), speed)
         end
+
+        # And give it a new kick of spin
+        movable_spin((30 + 60.randomize(:ratio)).randomize(:sign))
 
       end
 

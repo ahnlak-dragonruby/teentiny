@@ -70,6 +70,40 @@ module Ahnlak
     end
 
 
+    # Next up, methods for setting the angle of a Movable. In this context,
+    # a positive speed is clockwise and negative, anticlockwise
+    def movable_angle(angle, speed = 0)
+
+      # Always set the target angle
+      @movable_target_angle = angle
+
+      # If the speed is zero, move straing to it
+      if speed.zero?
+
+        @angle = angle
+
+      # Otherwise, work out the deltas, taking on board the direction
+      else
+
+        angle += 360 if speed.positive? and angle < @angle
+        angle -= 360 if speed.negative? and angle > @angle
+
+        @movable_delta_angle = (angle - @angle) / speed.abs
+
+      end
+
+    end
+
+    def movable_spin(speed)
+
+      # The speed here it the frames for one complete revolution; set the
+      # spin flag and work out the right delta
+      @movable_spinning = true
+      @movable_delta_angle = 360 / speed
+
+    end
+
+
     # Method to let us know if we're moving
     def movable_moving?
 
@@ -83,6 +117,7 @@ module Ahnlak
 
       # Work through the different aspects we update
       movable_location_update
+      movable_angle_update
 
     end
 
@@ -134,6 +169,22 @@ module Ahnlak
         @movable_locations[@movable_location_index][1],
         @movable_location_speed
       )
+
+    end
+
+    # Angle update handler
+    def movable_angle_update
+
+      # Do we have an angle delta to apply?
+      if @movable_delta_angle&.nonzero?
+
+        # Apply the delta, normalised to 360 degrees
+        @angle = (@angle + @movable_delta_angle) % 360
+
+        # If we're eternally spinning, that's all we have to worry about
+        return if @movable_spinning
+
+      end
 
     end
 
