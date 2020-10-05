@@ -85,8 +85,8 @@ module Ahnlak
       # Otherwise, work out the deltas, taking on board the direction
       else
 
-        angle += 360 if speed.positive? and angle < @angle
-        angle -= 360 if speed.negative? and angle > @angle
+        angle += 360 if speed.positive? && angle < @angle
+        angle -= 360 if speed.negative? && angle > @angle
 
         @movable_delta_angle = (angle - @angle) / speed.abs
 

@@ -1,7 +1,7 @@
 # regular_polygon.rb - part of Vertices, a TeenyTiny Jam Game
 #
 # The RegularPolygon class is a sprite that represents a regular polygon;
-# it's drawn onto a render_target which is used for display, and will 
+# it's drawn onto a render_target which is used for display, and will
 # handle all the collision detection you might ask for.
 
 module Vertices
@@ -37,10 +37,69 @@ module Vertices
       movable_spin((30 + 60.randomize(:ratio)).randomize(:sign))
 
       # Create an appropriate render target
-      args.render_target(@path).borders << { x: 0, y: 0, w: @w, h: @h, r: @r, g: @g, b: @b, a: 255 }
-      args.render_target(@path).labels << { x: 2, y: 20, r: @r, g: @g, b: @b, a: 255, text: vertices.to_s }
+      # args.render_target(@path).borders << { x: 0, y: 0, w: @w, h: @h, r: @r, g: @g, b: @b, a: 255 }
+      args.render_target(@path).labels << {
+        x: radius * 1.1, y: radius * 1.3,
+        r: @r, g: @g, b: @b, a: 255,
+        font: 'fonts/Kenney Future Square.ttf',
+        size_enum: 10, alignment_enum: 1, text: vertices.to_s
+      }
+
+      # Draw the polygon, in a hopefully nice way
+      20.times do |x|
+        args.render_target(@path).lines << polygon_draw(vertices, radius, radius, radius - x, x * 6)
+      end
 
     end
+
+
+    # Method to draw a polygon with a specified center and radius; returns
+    # an array of lines
+    def polygon_draw(vertices, center_x, center_y, radius, tone)
+
+      # So, this will all go back in a big array
+      lines = []
+
+      # Draw the shape; start with the first vertex at 12 o'clock
+      vertex_x = last_x = center_x
+      vertex_y = last_y = center_y + radius
+      vertex_angle = 360 / vertices
+
+      # And then work through all the sides
+      (1..vertices).each do |vertex|
+
+        # Calculate the next point
+        next_x = center_x + (vertex_x - center_x) * Math.cos((vertex_angle * vertex).to_radians) -
+                 (vertex_y - center_y) * Math.sin((vertex_angle * vertex).to_radians)
+        next_y = center_y + (vertex_x - center_x) * Math.sin((vertex_angle * vertex).to_radians) +
+                 (vertex_y - center_y) * Math.cos((vertex_angle * vertex).to_radians)
+
+        # And draw a line to the next vertex
+        lines << { x: last_x, y: last_y, x2: next_x, y2: next_y, r: @r - tone, g: @g - tone, b: @b - tone, a: @a }
+
+        # Lastly, remember the last point
+        last_x = next_x
+        last_y = next_y
+
+      end
+
+      # Finally, close the loop
+      lines << { x: vertex_x, y: vertex_y, x2: last_x, y2: last_y, r: @r - tone, g: @g - tone, b: @b - tone, a: @a }
+      lines
+
+    end
+
+
+    # Function to see if we've been clicked
+    def contains(column, row)
+
+      # For now, we'll just do a circle check within our radius - a circle
+      # definitely contains our polygon, and this just gives the user a bit
+      # of flex, too
+
+
+    end
+
 
     # Central update, that works through all the mixin updates
     def update

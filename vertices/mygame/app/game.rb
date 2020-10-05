@@ -8,7 +8,7 @@ module Vertices
   class Game
 
     include Ahnlak::MixinSerializable
-    attr_accessor :args
+    attr_reader :args
 
     # Constructor, which creates the basic world
     def initialize(args)
@@ -155,22 +155,20 @@ module Vertices
       # then spawn some more
       shape_count = (3 + (@args.tick_count - @args.state.vertices.start_tick) / 180).to_i
       while @args.state.vertices.polygons.length < shape_count
-        @args.state.vertices.polygons << {
-          vertices: 3 + 7.randomize(:ratio).to_i
-        }
+        @args.state.vertices.polygons << { vertices: 3 + 5.randomize(:ratio).to_i }
       end
 
       # We need to make sure that our polygon list reflects what's in the state
       @args.state.vertices.polygons.each do |polygon|
 
         # If we have a path defined, find it in our polygon list and update locations
-        if polygon.has_key?(:path)
+        if polygon.key?(:path)
 
         # Then we need to create a new one
         else
 
           # Spawn it, and save the path of it
-          new_poly = RegularPolygon.new(args, 32, polygon[:vertices])
+          new_poly = RegularPolygon.new(args, 64, polygon[:vertices])
           polygon[:path] = new_poly.path
 
           # Finally add it to our internal list
@@ -181,7 +179,7 @@ module Vertices
       end
 
       # And make sure we keep our polygon sprites updated
-      @polygons.each { |polygon| polygon.update }
+      @polygons.each(&:update)
 
     end
 
