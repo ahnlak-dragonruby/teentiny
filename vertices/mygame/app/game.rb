@@ -159,6 +159,44 @@ module Vertices
       end
 
       # We need to make sure that our polygon list reflects what's in the state
+      spawn_polygons
+
+      # And make sure we keep our polygon sprites updated
+      @polygons.each(&:update)
+
+      # Finally (c), see if the user clicked and then check if it was on a
+      # polygon. So, what's the lowest vertex count?
+      min_vertex = @polygons.min { |a, b| a.vertices <=> b.vertices }.vertices
+      if @args.inputs.mouse.click
+
+        # Look through the polygons, seeing if we have a hit
+        hits = @polygons.select { |shape| shape.contains(@args.inputs.mouse.click.point) }
+
+        # And then for each one, see if it's the lowest vertex count
+        hits.each do |shape|
+
+          # If it's legit then increase the counter and erase the polygon
+          if shape.vertices <= min_vertex
+            @args.state.vertices.shape_count += 1
+            @polygons.delete(shape)
+            @args.state.vertices.polygons.delete_if { |poly| poly[:path] == shape.path }
+            next
+          end
+
+          # In this case, we've clicked on a shape with too many sides!
+          puts "bad click!"
+
+        end
+
+      end
+
+    end
+
+
+    # Run through the polygons in args.state, and ensure that we have all the
+    # appropriate RegularPolygon objects spawned
+    def spawn_polygons
+
       @args.state.vertices.polygons.each do |polygon|
 
         # If we have a path defined, find it in our polygon list and update locations
@@ -178,10 +216,8 @@ module Vertices
 
       end
 
-      # And make sure we keep our polygon sprites updated
-      @polygons.each(&:update)
-
     end
+
 
     # Handle updates when we're at the title screen
     def update_title

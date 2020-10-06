@@ -15,12 +15,15 @@ module Vertices
     include Ahnlak::MixinSerializable
     attr_sprite
     attr_accessor :args
+    attr_reader :vertices
 
     # Constructor; needs the bare minimum to form a polygon
     def initialize(args, radius, vertices)
 
       # Remember the args
       @args = args
+      @radius = radius
+      @vertices = vertices
 
       # Set some colour defaults
       colourable(55 + 200.randomize(:ratio), 155 + 100.randomize(:ratio), 55 + 200.randomize(:ratio), 255, 0)
@@ -91,12 +94,12 @@ module Vertices
 
 
     # Function to see if we've been clicked
-    def contains(column, row)
+    def contains(point)
 
       # For now, we'll just do a circle check within our radius - a circle
       # definitely contains our polygon, and this just gives the user a bit
       # of flex, too
-
+      return (point.x - (@x + @radius)) ** 2 + (point.y - (@y + @radius)) ** 2 < @radius ** 2
 
     end
 
