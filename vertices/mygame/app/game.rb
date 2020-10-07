@@ -23,6 +23,7 @@ module Vertices
       @args.state.vertices.play_ticks ||= 10.seconds
       @args.state.vertices.polygons ||= []
       @polygons = []
+      @stars = []
 
       # Initialise some other bits - again, set some defaults
       @prompt = []
@@ -112,6 +113,9 @@ module Vertices
 
     # Update the world
     def update
+
+      # Keep the starfield moving
+      update_starfield
 
       # Call the appropriate updater, depending on what mode we're in
       if @args.state.vertices.running
@@ -259,9 +263,59 @@ module Vertices
     end
 
 
+    # Maintain a nice starfield to drive through
+    def update_starfield
+
+      # We should always have roughly the same star density, but let's not
+      # spawn them *all* at ones
+      if @stars.length < 250
+
+        # So, spawn up to a few of them
+        10.randomize(:ratio).to_i.times do
+          @stars << {
+            x: @args.grid.center_x, y: @args.grid.center_y,
+            dx: 5.randomize(:ratio, :sign), dy: 5.randomize(:ratio, :sign),
+            age: 0, show: 25.randomize(:ratio),
+            r: 100 + 155.randomize(:ratio), g: 100 + 155.randomize(:ratio), b: 100 + 155.randomize(:ratio)
+          }
+        end
+
+      end
+
+      # And then work through all stars applying the delta
+      @stars.each do |star| 
+        star[:x] += star[:dx]
+        star[:y] += star[:dy]
+      end
+
+      # And prune any that fall off the screen
+      @stars.delete_if do |star|
+        star[:x] < 0 || star[:x] > @args.grid.w || star[:y] < 0 || star[:y] > @args.grid.h
+      end
+
+    end
+
+    def render_starfield
+
+      # Just draw a one pixel solid for each star
+      @stars.each do |star|
+        if star[:age] > star[:show]
+          @args.outputs.solids << {
+            x: star[:x], y: star[:y], w: 1, h: 1,
+            r: star[:r], g: star[:g], b: star[:b], a: 255
+          }
+        end
+        star[:age] += 1
+      end
+
+    end
+
 
     # Render the world
     def render
+
+      # Whatever mode we're in, we always want a starfield
+      render_starfield
 
       # If we're running, we show the count down and draw the shaps
       if @args.state.vertices.running

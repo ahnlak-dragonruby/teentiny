@@ -50,8 +50,9 @@ module Vertices
 
       # Draw the polygon, in a hopefully nice way
       20.times do |x|
-        args.render_target(@path).lines << polygon_draw(vertices, radius, radius, radius - x, x * 6)
+        args.render_target(@path).lines << polygon_draw(vertices, radius, radius, radius - x, x * 8)
       end
+      args.render_target(@path).lines << polygon_draw(vertices, radius, radius, radius, -255)
 
     end
 
@@ -115,7 +116,7 @@ module Vertices
       unless movable_moving?
 
         # Pick a side to move to
-        speed = 75 + 30.randomize(:ratio)
+        speed = 60 + 35.randomize(:ratio)
         case 4.randomize(:ratio).to_i
         when 0
           movable_location(0, (args.grid.h - @h - 10).randomize(:ratio), speed)
