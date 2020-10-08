@@ -11,6 +11,18 @@ module Vertices
     # Everything important is wrapped in the Game object
     @game = Game.new(args)
 
+    # Start playing a really annoying tune
+    args.outputs.sounds << 'sounds/title.ogg'
+
+    # Tag the release version
+    args.state.vertices.version = '0.1.1'
+    args.outputs.static_labels << { 
+      x: 10, y: 25, size_enum: 0, 
+      font: 'fonts/Kenney Future Square.ttf',
+      r: 200, g: 200, b: 200, a: 128,
+      text: "Version #{args.state.vertices.version}" 
+    }
+
     # Lastly, flag that we're definitely intialised
     args.state.vertices.initialized = true
 

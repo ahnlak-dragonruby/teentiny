@@ -116,7 +116,7 @@ module Vertices
       unless movable_moving?
 
         # Pick a side to move to
-        speed = 60 + 35.randomize(:ratio)
+        speed = 60 + 40.randomize(:ratio)
         case 4.randomize(:ratio).to_i
         when 0
           movable_location(0, (args.grid.h - @h - 10).randomize(:ratio), speed)
@@ -129,7 +129,7 @@ module Vertices
         end
 
         # And give it a new kick of spin
-        movable_spin((30 + 60.randomize(:ratio)).randomize(:sign))
+        movable_spin((50 + 30.randomize(:ratio)).randomize(:sign))
 
       end
 

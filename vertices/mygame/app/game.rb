@@ -55,6 +55,10 @@ module Vertices
       # And load up our sprites
       load_sprites
 
+      # The system icons are static
+      args.outputs.static_sprites << @audio_sprite
+      args.outputs.static_sprites << @music_sprite
+
     end
 
 
@@ -66,6 +70,36 @@ module Vertices
 
       # And echo that to the polygons
       @polygons.each { |polygon| polygon.args = args }
+
+    end
+
+
+    # Toggles for music and audio flags
+    def enable_audio(on=true)
+
+      # Set the flag
+      @audio = on
+
+      # Update the icon
+      if @audio
+        @audio_sprite.path = 'sprites/audioOn.png'
+      else
+        @audio_sprite.path = 'sprites/audioOff.png'
+      end
+
+    end
+
+    def enable_music(on=true)
+
+      # Set the flag
+      @music = on
+
+      # Update the icon
+      if @music
+        @music_sprite.path = 'sprites/musicOn.png'
+      else
+        @music_sprite.path = 'sprites/musicOff.png'
+      end
 
     end
 
@@ -108,6 +142,24 @@ module Vertices
         ], 10
       )
 
+      # Lastly, music and audio icons
+      @audio_sprite = TintedSprite.new(w:50, h:50, path: 'sprites/audioOn.png')
+      @audio_sprite.movable_location((@args.grid.w - 60), 10)
+      @audio_sprite.colourable_cycle(
+        [
+          [255, 200, 200, 128],
+          [200, 200, 255, 128]
+        ], 60
+      )
+      @music_sprite = TintedSprite.new(w:50, h:50, path: 'sprites/musicOn.png')
+      @music_sprite.movable_location((@args.grid.w - 110), 10)
+      @music_sprite.colourable_cycle(
+        [
+          [255, 200, 200, 128],
+          [200, 200, 255, 128]
+        ], 60
+      )
+
     end
 
 
@@ -116,6 +168,10 @@ module Vertices
 
       # Keep the starfield moving
       update_starfield
+
+      # And the system icons
+      @audio_sprite.update
+      @music_sprite.update
 
       # Call the appropriate updater, depending on what mode we're in
       if @args.state.vertices.running
@@ -150,6 +206,9 @@ module Vertices
         # And stop the running state
         @args.state.vertices.running = false
 
+        # Switch back to the title music
+        args.outputs.sounds << 'sounds/title.ogg'
+
         # Skip the rest of the processing
         return
 
@@ -164,9 +223,6 @@ module Vertices
 
       # We need to make sure that our polygon list reflects what's in the state
       spawn_polygons
-
-      # And make sure we keep our polygon sprites updated
-      @polygons.each(&:update)
 
       # Finally (c), see if the user clicked and then check if it was on a
       # polygon. So, what's the lowest vertex count?
@@ -193,6 +249,9 @@ module Vertices
         end
 
       end
+
+      # And finally, make sure we keep our polygon sprites updated
+      @polygons.each(&:update)
 
     end
 
@@ -254,6 +313,9 @@ module Vertices
 
         # Set the shape count to zero
         @args.state.vertices.shape_count = 0
+
+        # Start the right music
+        args.outputs.sounds << 'sounds/play.ogg'
 
         # And flag ourselves as running
         @args.state.vertices.running = true
