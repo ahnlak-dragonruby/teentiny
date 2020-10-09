@@ -100,7 +100,7 @@ module Vertices
       # For now, we'll just do a circle check within our radius - a circle
       # definitely contains our polygon, and this just gives the user a bit
       # of flex, too
-      return (point.x - (@x + @radius)) ** 2 + (point.y - (@y + @radius)) ** 2 < @radius ** 2
+      (point.x - (@x + @radius))**2 + (point.y - (@y + @radius))**2 < @radius**2
 
     end
 
@@ -112,26 +112,26 @@ module Vertices
       colourable_update
       movable_update
 
-      # If we've reached the end of our last movement, pick a new destination
-      unless movable_moving?
+      # All done if we're still moving
+      return if movable_moving?
 
-        # Pick a side to move to
-        speed = 60 + 40.randomize(:ratio)
-        case 4.randomize(:ratio).to_i
-        when 0
-          movable_location(0, (args.grid.h - @h - 10).randomize(:ratio), speed)
-        when 1
-          movable_location((args.grid.w - @w).randomize(:ratio), 0, speed)
-        when 2
-          movable_location((args.grid.w - @w), (args.grid.h - @h - 10).randomize(:ratio), speed)
-        when 3
-          movable_location((args.grid.w - @w).randomize(:ratio), (args.grid.h - @h - 10), speed)
-        end
+      # We've reached the end of our last movement, so pick a new destination
 
-        # And give it a new kick of spin
-        movable_spin((50 + 30.randomize(:ratio)).randomize(:sign))
-
+      # Pick a side to move to
+      speed = 60 + 40.randomize(:ratio)
+      case 4.randomize(:ratio).to_i
+      when 0
+        movable_location(0, (args.grid.h - @h - 10).randomize(:ratio), speed)
+      when 1
+        movable_location((args.grid.w - @w).randomize(:ratio), 0, speed)
+      when 2
+        movable_location((args.grid.w - @w), (args.grid.h - @h - 10).randomize(:ratio), speed)
+      when 3
+        movable_location((args.grid.w - @w).randomize(:ratio), (args.grid.h - @h - 10), speed)
       end
+
+      # And give it a new kick of spin
+      movable_spin((50 + 30.randomize(:ratio)).randomize(:sign))
 
     end
 

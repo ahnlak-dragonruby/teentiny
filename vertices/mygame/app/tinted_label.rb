@@ -19,6 +19,7 @@ module Vertices
     end
 
     # Constructor; takes the usual sprite hash
+    # rubocop:disable Style/GuardClause
     def initialize(**params)
 
       # Set some colour defaults
@@ -36,6 +37,7 @@ module Vertices
       end
 
     end
+    # rubocop:enable Style/GuardClause
 
     # Central update, that works through all the mixin updates
     def update

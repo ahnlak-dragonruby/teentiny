@@ -33,6 +33,15 @@ module Vertices
       movable_update
     end
 
+    # Simple contains check; does a given point fall within the sprite bounds?
+    def contains?(point)
+      contains_xy?(point.x, point.y)
+    end
+
+    def contains_xy?(column, row)
+      column > @x && column < @x + @w && row > @y && row < @y + @h
+    end
+
   end
 
 end

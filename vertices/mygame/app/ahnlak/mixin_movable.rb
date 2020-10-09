@@ -173,6 +173,7 @@ module Ahnlak
     end
 
     # Angle update handler
+    # rubocop:disable Style/GuardClause
     def movable_angle_update
 
       # Do we have an angle delta to apply?
@@ -187,6 +188,7 @@ module Ahnlak
       end
 
     end
+    # rubocop:enable Style/GuardClause
 
   end
 

@@ -22,8 +22,8 @@ rather a fun little thing with a strong 'one more go' appeal.
 
 The basic graphics are all mine. Sorry.
 
-The font and icons come from [Kenney's Game Assets](https://kenney.nl), whose asset packs
-are a fantastic resource.
+The font, icons and sound effects come from [Kenney's Game Assets](https://kenney.nl), 
+whose asset packs are a fantastic resource.
 
 The music comes from [Subspace Audio](https://juhanijunkala.com/), via 
 [OpenGameArg.org](https://opengameart.org/content/5-chiptunes-action)

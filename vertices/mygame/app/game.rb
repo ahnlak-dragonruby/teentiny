@@ -20,10 +20,14 @@ module Vertices
       @args.state.vertices.running = false
 
       # Set some basic game parameters
-      @args.state.vertices.play_ticks ||= 10.seconds
+      @args.state.vertices.play_ticks ||= 20.seconds
+      @args.state.vertices.target_shapes ||= 5
       @args.state.vertices.polygons ||= []
       @polygons = []
       @stars = []
+
+      @track = 'sounds/title.ogg'
+
 
       # Initialise some other bits - again, set some defaults
       @prompt = []
@@ -38,7 +42,7 @@ module Vertices
         visible: true,
         x: @args.grid.center_x, y: 325,
         alignment_enum: 1, size_enum: 15,
-        text: 'How many can you click in time?!',
+        text: "Can you clear #{@args.state.vertices.target_shapes} shapes in time?!",
         font: 'fonts/Kenney Future Square.ttf'
       )
       @prompt.each do |prompt|
@@ -58,6 +62,8 @@ module Vertices
       # The system icons are static
       args.outputs.static_sprites << @audio_sprite
       args.outputs.static_sprites << @music_sprite
+      enable_audio
+      enable_music(on: false)
 
     end
 
@@ -75,32 +81,55 @@ module Vertices
 
 
     # Toggles for music and audio flags
-    def enable_audio(on=true)
+    def enable_audio(on: true)
 
       # Set the flag
       @audio = on
 
       # Update the icon
-      if @audio
-        @audio_sprite.path = 'sprites/audioOn.png'
-      else
-        @audio_sprite.path = 'sprites/audioOff.png'
-      end
+      @audio_sprite.path =
+        if @audio
+          'sprites/audioOn.png'
+        else
+          'sprites/audioOff.png'
+        end
 
     end
 
-    def enable_music(on=true)
+    def enable_music(on: true)
 
       # Set the flag
       @music = on
 
       # Update the icon
-      if @music
-        @music_sprite.path = 'sprites/musicOn.png'
+      @music_sprite.path =
+        if @music
+          'sprites/musicOn.png'
+        else
+          'sprites/musicOff.png'
+        end
+
+      # turn on music, if both music *and* audio is enabled
+      if @music && @audio
+
+        @args.outputs.sounds << @track
+
       else
-        @music_sprite.path = 'sprites/musicOff.png'
+
+        # Make sure the music isn't playing then - one day there will be a
+        # more subtle way of doing this...
+        $gtk.stop_music
+
       end
 
+    end
+
+    def toggle_audio
+      enable_audio(on: !@audio)
+    end
+
+    def toggle_music
+      enable_music(on: !@music)
     end
 
 
@@ -143,7 +172,7 @@ module Vertices
       )
 
       # Lastly, music and audio icons
-      @audio_sprite = TintedSprite.new(w:50, h:50, path: 'sprites/audioOn.png')
+      @audio_sprite = TintedSprite.new(w: 50, h: 50, path: 'sprites/audioOn.png')
       @audio_sprite.movable_location((@args.grid.w - 60), 10)
       @audio_sprite.colourable_cycle(
         [
@@ -151,7 +180,7 @@ module Vertices
           [200, 200, 255, 128]
         ], 60
       )
-      @music_sprite = TintedSprite.new(w:50, h:50, path: 'sprites/musicOn.png')
+      @music_sprite = TintedSprite.new(w: 50, h: 50, path: 'sprites/musicOn.png')
       @music_sprite.movable_location((@args.grid.w - 110), 10)
       @music_sprite.colourable_cycle(
         [
@@ -168,6 +197,14 @@ module Vertices
 
       # Keep the starfield moving
       update_starfield
+
+      # Check to see if the music and sound toggles have been clicked
+      if @args.inputs.mouse.click
+
+        toggle_music if @music_sprite.contains?(@args.inputs.mouse.click.point)
+        toggle_audio if @audio_sprite.contains?(@args.inputs.mouse.click.point)
+
+      end
 
       # And the system icons
       @audio_sprite.update
@@ -193,11 +230,24 @@ module Vertices
       # and (c) see if the user clicks on one of them
 
       # (a) count down, and handle if we're out of time
-      if @args.tick_count > @args.state.vertices.start_tick + @args.state.vertices.play_ticks
+      if @args.tick_count > @args.state.vertices.start_tick + @args.state.vertices.play_ticks ||
+         @args.state.vertices.shape_count >= @args.state.vertices.target_shapes
 
-        # Update the prompts to record the total count of objects
-        @prompt[0].text = "You managed to click on #{@args.state.vertices.shape_count} shapes!"
-        @prompt[1].text = 'Can you get click on even more?!'
+        # Update the prompts to reflect the success or otherwise
+        if @args.state.vertices.shape_count >= @args.state.vertices.target_shapes
+
+          # If they've succeeded, how about we make it a bit more challenging?!
+          @args.state.vertices.target_shapes += 2
+
+          # And sort out the prompt
+          secs_left = (20 - ((@args.tick_count - @args.state.vertices.start_tick) / 60)).to_i
+          @prompt[0].text = "You managed it with #{secs_left} seconds left!"
+          @prompt[1].text = "Can you get #{@args.state.vertices.target_shapes} shapes now?"
+
+        else
+          @prompt[0].text = "You only managed #{@args.state.vertices.shape_count} shapes!"
+          @prompt[1].text = 'Can you do better?'
+        end
 
         # Clear out the active polygons
         @args.state.vertices.polygons.clear
@@ -207,7 +257,8 @@ module Vertices
         @args.state.vertices.running = false
 
         # Switch back to the title music
-        args.outputs.sounds << 'sounds/title.ogg'
+        @track = 'sounds/title.ogg'
+        args.outputs.sounds << @track if @music && @audio
 
         # Skip the rest of the processing
         return
@@ -240,11 +291,12 @@ module Vertices
             @args.state.vertices.shape_count += 1
             @polygons.delete(shape)
             @args.state.vertices.polygons.delete_if { |poly| poly[:path] == shape.path }
+            @args.outputs.sounds << 'sounds/hit.wav' if @audio
             next
           end
 
           # In this case, we've clicked on a shape with too many sides!
-          puts "bad click!"
+          @args.outputs.sounds << 'sounds/miss.wav' if @audio
 
         end
 
@@ -315,7 +367,8 @@ module Vertices
         @args.state.vertices.shape_count = 0
 
         # Start the right music
-        args.outputs.sounds << 'sounds/play.ogg'
+        @track = 'sounds/play.ogg'
+        args.outputs.sounds << @track if @music && @audio
 
         # And flag ourselves as running
         @args.state.vertices.running = true
@@ -345,14 +398,14 @@ module Vertices
       end
 
       # And then work through all stars applying the delta
-      @stars.each do |star| 
+      @stars.each do |star|
         star[:x] += star[:dx]
         star[:y] += star[:dy]
       end
 
       # And prune any that fall off the screen
       @stars.delete_if do |star|
-        star[:x] < 0 || star[:x] > @args.grid.w || star[:y] < 0 || star[:y] > @args.grid.h
+        star[:x].negative? || star[:x] > @args.grid.w || star[:y].negative? || star[:y] > @args.grid.h
       end
 
     end
