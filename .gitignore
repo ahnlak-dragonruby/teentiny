@@ -4,6 +4,7 @@ exceptions/
 logs/
 samples/
 tmp/
+builds/
 CHANGELOG.txt
 console_history.txt
 ctags-emacs
