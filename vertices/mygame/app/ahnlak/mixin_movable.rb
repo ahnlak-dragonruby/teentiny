@@ -70,6 +70,30 @@ module Ahnlak
     end
 
 
+    # Similar work, but for sizes
+    def movable_size(width, height, speed = 0)
+
+      # Always set the target size
+      @movable_target_w = width
+      @movable_target_h = height
+
+      # If the speed is zero, set it direct
+      if speed.zero?
+
+        @w = width
+        @h = height
+
+      # Otherwise, calculate the deltas
+      else
+
+        @movable_delta_w = (width - @w) / speed
+        @movable_delta_h = (height - @h) / speed
+
+      end
+
+    end
+
+
     # Next up, methods for setting the angle of a Movable. In this context,
     # a positive speed is clockwise and negative, anticlockwise
     def movable_angle(angle, speed = 0)
@@ -117,6 +141,7 @@ module Ahnlak
 
       # Work through the different aspects we update
       movable_location_update
+      movable_size_update
       movable_angle_update
 
     end
@@ -171,6 +196,40 @@ module Ahnlak
       )
 
     end
+
+    # Size update handler
+    def movable_size_update
+
+      # Apply either size delta that is nonzero
+      if @movable_delta_w&.nonzero?
+
+        # Apply the delta
+        @w += @movable_delta_w
+
+        # And see if we reached the target
+        if (@movable_delta_w.positive? && @w >= @movable_target_w) ||
+           (@movable_delta_w.negative? && @w <= @movable_target_w)
+          @w = @movable_target_w
+          @movable_delta_w = 0
+        end
+
+      end
+
+      if @movable_delta_h&.nonzero?
+
+        # Apply the delta
+        @h += @movable_delta_h
+
+        # And see if we reached the target
+        if (@movable_delta_h.positive? && @h >= @movable_target_h) ||
+           (@movable_delta_h.negative? && @h <= @movable_target_h)
+          @h = @movable_target_h
+          @movable_delta_h = 0
+        end
+
+      end
+
+    end    
 
     # Angle update handler
     # rubocop:disable Style/GuardClause

@@ -12,6 +12,8 @@ module Vertices
     include Ahnlak::MixinMovable
     include Ahnlak::MixinSerializable
 
+    attr_accessor :visible
+
     # One day, this should be wrapped in attr_label...
     attr_accessor :x, :y, :text, :size_enum, :alignment_enum, :font, :r, :g, :b, :a
     def primitive_marker
@@ -30,14 +32,55 @@ module Vertices
         instance_variable_set(key.to_s.prepend('@'), value)
       end
 
-      # If we're set as not visible, move the label off screen
-      unless @visible
-        @x = $gtk.args.grid.w + 10
-        @y = $gtk.args.grid.h + 10
-      end
+      # Make sure to set x and y appropriate for visiblity
+      self.x = @x
+      self.y = @y
 
     end
     # rubocop:enable Style/GuardClause
+
+    # The visible value needs to be a bit clever
+    def visible=(flag)
+
+      # Save the flag, obviously
+      @visible = flag
+
+      # If we're going invisible, move off the screen
+      unless flag
+        @x = $gtk.args.grid.w + @x if @x < $gtk.args.grid.w
+        @y = $gtk.args.grid.h + @y if @y < $gtk.args.grid.h
+        return
+      end
+
+      # Then we're becoming visible
+      @x = @x - $gtk.args.grid.w if @x >= $gtk.args.grid.w
+      @y = @y - $gtk.args.grid.h if @y >= $gtk.args.grid.h
+
+    end
+
+    # Similarly, the x and y setters need to be aware of visibility
+    def x=(column)
+      @x =
+        if @visible
+          column
+        else
+          $gtk.args.grid.w + column
+        end
+    end
+
+    def y=(row)
+      @y =
+        if @visible
+          row
+        else
+          $gtk.args.grid.h + row
+        end
+    end
+
+    # Grow the size by a defined amount
+    def grow(amount)
+      @size_enum += amount
+    end
 
     # Central update, that works through all the mixin updates
     def update

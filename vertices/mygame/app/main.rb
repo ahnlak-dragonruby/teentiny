@@ -9,6 +9,7 @@
 require 'app/ahnlak/mixin_colourable.rb'
 require 'app/ahnlak/mixin_movable.rb'
 require 'app/ahnlak/mixin_serializable.rb'
+require 'app/counter.rb'
 require 'app/game.rb'
 require 'app/regular_polygon.rb'
 require 'app/tinted_label.rb'

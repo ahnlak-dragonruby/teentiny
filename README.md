@@ -3,7 +3,7 @@ MiniGameJam
 
 These are all minigames developed as part of the impending TeenyTiny DragonRuby MiniGameJam.
 
-They are all developed using version 1.22 of DragonRuby, but in theory should be compatible
+They are all developed using version 1.25 of DragonRuby, but in theory should be compatible
 with other versions :-)
 
 

@@ -21,7 +21,7 @@ module Vertices
 
       # Set some basic game parameters
       @args.state.vertices.play_ticks ||= 20.seconds
-      @args.state.vertices.target_shapes ||= 5
+      @args.state.vertices.target_shapes ||= 10
       @args.state.vertices.polygons ||= []
       @polygons = []
       @stars = []
@@ -55,6 +55,7 @@ module Vertices
           30
         )
       end
+      @counter = Counter.new(args)
 
       # And load up our sprites
       load_sprites
@@ -63,7 +64,7 @@ module Vertices
       args.outputs.static_sprites << @audio_sprite
       args.outputs.static_sprites << @music_sprite
       enable_audio
-      enable_music(on: false)
+      enable_music
 
     end
 
@@ -94,6 +95,8 @@ module Vertices
           'sprites/audioOff.png'
         end
 
+      check_music
+
     end
 
     def enable_music(on: true)
@@ -108,6 +111,12 @@ module Vertices
         else
           'sprites/musicOff.png'
         end
+
+      check_music
+
+    end
+
+    def check_music
 
       # turn on music, if both music *and* audio is enabled
       if @music && @audio
@@ -258,7 +267,7 @@ module Vertices
 
         # Switch back to the title music
         @track = 'sounds/title.ogg'
-        args.outputs.sounds << @track if @music && @audio
+        check_music
 
         # Skip the rest of the processing
         return
@@ -271,6 +280,7 @@ module Vertices
       while @args.state.vertices.polygons.length < shape_count
         @args.state.vertices.polygons << { vertices: 3 + 5.randomize(:ratio).to_i }
       end
+      @counter.update
 
       # We need to make sure that our polygon list reflects what's in the state
       spawn_polygons
@@ -288,11 +298,17 @@ module Vertices
 
           # If it's legit then increase the counter and erase the polygon
           if shape.vertices <= min_vertex
+
+            # Keep track of how many shapes they've clicked
             @args.state.vertices.shape_count += 1
+            @counter.count = @args.state.vertices.shape_count
+
+            # Remove the polygon they clicked on
             @polygons.delete(shape)
             @args.state.vertices.polygons.delete_if { |poly| poly[:path] == shape.path }
             @args.outputs.sounds << 'sounds/hit.wav' if @audio
             next
+
           end
 
           # In this case, we've clicked on a shape with too many sides!
@@ -368,7 +384,7 @@ module Vertices
 
         # Start the right music
         @track = 'sounds/play.ogg'
-        args.outputs.sounds << @track if @music && @audio
+        check_music
 
         # And flag ourselves as running
         @args.state.vertices.running = true
@@ -444,6 +460,9 @@ module Vertices
 
         # And draw each polygon
         @args.outputs.sprites << @polygons
+
+        # Draw a splash if there is one
+        @args.outputs.sprites << @counter if @counter.visible?
 
       # If not, we just show the splash/prompt screen
       else

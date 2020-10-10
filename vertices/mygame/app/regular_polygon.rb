@@ -118,7 +118,7 @@ module Vertices
       # We've reached the end of our last movement, so pick a new destination
 
       # Pick a side to move to
-      speed = 60 + 40.randomize(:ratio)
+      speed = 80 + 40.randomize(:ratio)
       case 4.randomize(:ratio).to_i
       when 0
         movable_location(0, (args.grid.h - @h - 10).randomize(:ratio), speed)
