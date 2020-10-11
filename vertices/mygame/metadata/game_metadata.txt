@@ -2,5 +2,5 @@ devid=ahnlak
 devtitle=ahnlak
 gameid=vertices
 gametitle=Vertices!
-version=0.1
+version=0.1.1
 icon=metadata/icon.png
