@@ -12,16 +12,16 @@ module Vertices
     include Ahnlak::MixinMovable
     include Ahnlak::MixinSerializable
 
-    attr_accessor :visible
+    attr_reader :visible
 
     # One day, this should be wrapped in attr_label...
-    attr_accessor :x, :y, :text, :size_enum, :alignment_enum, :font, :r, :g, :b, :a
+    attr_reader :x, :y
+    attr_accessor :text, :size_enum, :alignment_enum, :font, :r, :g, :b, :a
     def primitive_marker
       :label
     end
 
     # Constructor; takes the usual sprite hash
-    # rubocop:disable Style/GuardClause
     def initialize(**params)
 
       # Set some colour defaults
@@ -37,7 +37,6 @@ module Vertices
       self.y = @y
 
     end
-    # rubocop:enable Style/GuardClause
 
     # The visible value needs to be a bit clever
     def visible=(flag)
@@ -53,8 +52,8 @@ module Vertices
       end
 
       # Then we're becoming visible
-      @x = @x - $gtk.args.grid.w if @x >= $gtk.args.grid.w
-      @y = @y - $gtk.args.grid.h if @y >= $gtk.args.grid.h
+      @x -= $gtk.args.grid.w if @x >= $gtk.args.grid.w
+      @y -= $gtk.args.grid.h if @y >= $gtk.args.grid.h
 
     end
 

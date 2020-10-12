@@ -1,6 +1,6 @@
 # counter.rb - part of Vertices, a TeenyTiny Jam Game
 #
-# The Counter class is a sprite which shows a growing, fading number in the 
+# The Counter class is a sprite which shows a growing, fading number in the
 # centre f the screen - it's done as a sprite so that we can scale it
 # arbitrarily because labels seem to have a hard and silent limit.
 

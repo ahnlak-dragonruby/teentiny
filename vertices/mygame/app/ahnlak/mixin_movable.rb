@@ -198,6 +198,7 @@ module Ahnlak
     end
 
     # Size update handler
+    # rubocop:disable Style/GuardClause
     def movable_size_update
 
       # Apply either size delta that is nonzero
@@ -229,7 +230,8 @@ module Ahnlak
 
       end
 
-    end    
+    end
+    # rubocop:enable Style/GuardClause
 
     # Angle update handler
     # rubocop:disable Style/GuardClause

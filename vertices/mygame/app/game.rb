@@ -26,8 +26,9 @@ module Vertices
       @polygons = []
       @stars = []
 
-      @track = 'sounds/title.ogg'
-
+      # Need an audio handler
+      @audio_handler = Ahnlak::ClassAudio.new
+      @audio_handler.play('sounds/title.ogg')
 
       # Initialise some other bits - again, set some defaults
       @prompt = []
@@ -63,8 +64,6 @@ module Vertices
       # The system icons are static
       args.outputs.static_sprites << @audio_sprite
       args.outputs.static_sprites << @music_sprite
-      enable_audio
-      enable_music
 
     end
 
@@ -85,60 +84,39 @@ module Vertices
     def enable_audio(on: true)
 
       # Set the flag
-      @audio = on
+      @audio_handler.audio = on
 
       # Update the icon
       @audio_sprite.path =
-        if @audio
+        if @audio_handler.audio
           'sprites/audioOn.png'
         else
           'sprites/audioOff.png'
         end
-
-      check_music
 
     end
 
     def enable_music(on: true)
 
       # Set the flag
-      @music = on
+      @audio_handler.music = on
 
       # Update the icon
       @music_sprite.path =
-        if @music
+        if @audio_handler.music
           'sprites/musicOn.png'
         else
           'sprites/musicOff.png'
         end
 
-      check_music
-
-    end
-
-    def check_music
-
-      # turn on music, if both music *and* audio is enabled
-      if @music && @audio
-
-        @args.outputs.sounds << @track
-
-      else
-
-        # Make sure the music isn't playing then - one day there will be a
-        # more subtle way of doing this...
-        $gtk.stop_music
-
-      end
-
     end
 
     def toggle_audio
-      enable_audio(on: !@audio)
+      enable_audio(on: !@audio_handler.audio)
     end
 
     def toggle_music
-      enable_music(on: !@music)
+      enable_music(on: !@audio_handler.music)
     end
 
 
@@ -204,6 +182,9 @@ module Vertices
     # Update the world
     def update
 
+      # Update the audio class before anything else
+      @audio_handler.update
+
       # Keep the starfield moving
       update_starfield
 
@@ -266,8 +247,7 @@ module Vertices
         @args.state.vertices.running = false
 
         # Switch back to the title music
-        @track = 'sounds/title.ogg'
-        check_music
+        @audio_handler.play('sounds/title.ogg')
 
         # Skip the rest of the processing
         return
@@ -306,13 +286,13 @@ module Vertices
             # Remove the polygon they clicked on
             @polygons.delete(shape)
             @args.state.vertices.polygons.delete_if { |poly| poly[:path] == shape.path }
-            @args.outputs.sounds << 'sounds/hit.wav' if @audio
+            @audio_handler.play('sounds/hit.wav')
             next
 
           end
 
           # In this case, we've clicked on a shape with too many sides!
-          @args.outputs.sounds << 'sounds/miss.wav' if @audio
+          @audio_handler.play('sounds/miss.wav')
 
         end
 
@@ -383,8 +363,7 @@ module Vertices
         @args.state.vertices.shape_count = 0
 
         # Start the right music
-        @track = 'sounds/play.ogg'
-        check_music
+        @audio_handler.play('sounds/play.ogg')
 
         # And flag ourselves as running
         @args.state.vertices.running = true
