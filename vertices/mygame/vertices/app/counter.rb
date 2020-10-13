@@ -58,7 +58,7 @@ module Vertices
       args.render_target(@path).labels << {
         x: 10, y: 128,
         r: 255, g: 255, b: 255, a: 255,
-        font: 'fonts/Kenney Future Square.ttf',
+        font: 'vertices/fonts/Kenney Future Square.ttf',
         size_enum: 50, text: @count.to_s
       }
 

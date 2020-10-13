@@ -44,9 +44,21 @@ module Vertices
       args.render_target(@path).labels << {
         x: radius * 1.1, y: radius * 1.3,
         r: @r, g: @g, b: @b, a: 255,
-        font: 'fonts/Kenney Future Square.ttf',
+        font: 'vertices/fonts/Kenney Future Square.ttf',
         size_enum: 10, alignment_enum: 1, text: vertices.to_s
       }
+
+      # If the vertex count is 6 or 9, underline it for clarity
+      if vertices == 6 || vertices == 9
+        args.render_target(@path).lines << {
+          x: radius - 5, y: radius / 1.5, x2: radius + 10, y2: radius / 1.5,
+          r: @r, g: @g, b: @b, a: 255
+        }
+        args.render_target(@path).lines << {
+          x: radius - 5, y: radius / 1.5 - 1, x2: radius + 10, y2: radius / 1.5 - 1,
+          r: @r, g: @g, b: @b, a: 255
+        }
+      end
 
       # Draw the polygon, in a hopefully nice way
       20.times do |x|

@@ -28,7 +28,7 @@ module Vertices
 
       # Need an audio handler
       @audio_handler = Ahnlak::ClassAudio.new
-      @audio_handler.play('sounds/title.ogg')
+      @audio_handler.play('vertices/sounds/title.ogg')
 
       # Initialise some other bits - again, set some defaults
       @prompt = []
@@ -37,14 +37,14 @@ module Vertices
         x: @args.grid.center_x, y: 400,
         alignment_enum: 1, size_enum: 15,
         text: 'Click on the shape with the fewest edges',
-        font: 'fonts/Kenney Future Square.ttf'
+        font: 'vertices/fonts/Kenney Future Square.ttf'
       )
       @prompt << TintedLabel.new(
         visible: true,
         x: @args.grid.center_x, y: 325,
         alignment_enum: 1, size_enum: 15,
         text: "Can you clear #{@args.state.vertices.target_shapes} shapes in time?!",
-        font: 'fonts/Kenney Future Square.ttf'
+        font: 'vertices/fonts/Kenney Future Square.ttf'
       )
       @prompt.each do |prompt|
         prompt.colourable_cycle(
@@ -89,9 +89,9 @@ module Vertices
       # Update the icon
       @audio_sprite.path =
         if @audio_handler.audio
-          'sprites/audioOn.png'
+          'vertices/sprites/audioOn.png'
         else
-          'sprites/audioOff.png'
+          'vertices/sprites/audioOff.png'
         end
 
     end
@@ -104,9 +104,9 @@ module Vertices
       # Update the icon
       @music_sprite.path =
         if @audio_handler.music
-          'sprites/musicOn.png'
+          'vertices/sprites/musicOn.png'
         else
-          'sprites/musicOff.png'
+          'vertices/sprites/musicOff.png'
         end
 
     end
@@ -124,7 +124,7 @@ module Vertices
     def load_sprites
 
       # Sort out the logo that we'll use when it's required
-      @logo_sprite = TintedSprite.new(w: 567, h: 135, path: 'sprites/logo.png')
+      @logo_sprite = TintedSprite.new(w: 567, h: 135, path: 'vertices/sprites/logo.png')
       @logo_sprite.colourable_cycle(
         [
           [255, 10, 0, 255],
@@ -149,7 +149,7 @@ module Vertices
       )
 
       # And the start button
-      @button_sprite = TintedSprite.new(w: 256, h: 64, path: 'sprites/start.png')
+      @button_sprite = TintedSprite.new(w: 256, h: 64, path: 'vertices/sprites/start.png')
       @button_sprite.movable_location((@args.grid.center_x - 128), 128)
       @button_sprite.colourable_cycle(
         [
@@ -159,7 +159,7 @@ module Vertices
       )
 
       # Lastly, music and audio icons
-      @audio_sprite = TintedSprite.new(w: 50, h: 50, path: 'sprites/audioOn.png')
+      @audio_sprite = TintedSprite.new(w: 50, h: 50, path: 'vertices/sprites/audioOn.png')
       @audio_sprite.movable_location((@args.grid.w - 60), 10)
       @audio_sprite.colourable_cycle(
         [
@@ -167,7 +167,7 @@ module Vertices
           [200, 200, 255, 128]
         ], 60
       )
-      @music_sprite = TintedSprite.new(w: 50, h: 50, path: 'sprites/musicOn.png')
+      @music_sprite = TintedSprite.new(w: 50, h: 50, path: 'vertices/sprites/musicOn.png')
       @music_sprite.movable_location((@args.grid.w - 110), 10)
       @music_sprite.colourable_cycle(
         [
@@ -247,7 +247,7 @@ module Vertices
         @args.state.vertices.running = false
 
         # Switch back to the title music
-        @audio_handler.play('sounds/title.ogg')
+        @audio_handler.play('vertices/sounds/title.ogg')
 
         # Skip the rest of the processing
         return
@@ -258,7 +258,7 @@ module Vertices
       # then spawn some more
       shape_count = (3 + (@args.tick_count - @args.state.vertices.start_tick) / 180).to_i
       while @args.state.vertices.polygons.length < shape_count
-        @args.state.vertices.polygons << { vertices: 3 + 5.randomize(:ratio).to_i }
+        @args.state.vertices.polygons << { vertices: 3 + 6.randomize(:ratio).to_i }
       end
       @counter.update
 
@@ -286,13 +286,13 @@ module Vertices
             # Remove the polygon they clicked on
             @polygons.delete(shape)
             @args.state.vertices.polygons.delete_if { |poly| poly[:path] == shape.path }
-            @audio_handler.play('sounds/hit.wav')
+            @audio_handler.play('vertices/sounds/hit.wav')
             next
 
           end
 
           # In this case, we've clicked on a shape with too many sides!
-          @audio_handler.play('sounds/miss.wav')
+          @audio_handler.play('vertices/sounds/miss.wav')
 
         end
 
@@ -363,7 +363,7 @@ module Vertices
         @args.state.vertices.shape_count = 0
 
         # Start the right music
-        @audio_handler.play('sounds/play.ogg')
+        @audio_handler.play('vertices/sounds/play.ogg')
 
         # And flag ourselves as running
         @args.state.vertices.running = true

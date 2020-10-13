@@ -12,10 +12,10 @@ module Vertices
     @game = Game.new(args)
 
     # Tag the release version
-    args.state.vertices.version = '0.1.1'
+    args.state.vertices.version = '0.1.3'
     args.outputs.static_labels << {
       x: 10, y: 25, size_enum: 0,
-      font: 'fonts/Kenney Future Square.ttf',
+      font: 'vertices/fonts/Kenney Future Square.ttf',
       r: 200, g: 200, b: 200, a: 128,
       text: "Version #{args.state.vertices.version}"
     }
