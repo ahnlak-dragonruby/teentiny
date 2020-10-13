@@ -33,3 +33,12 @@ called from within `main.rb` is `Vertices.tick(args)`.
 This is done with the hope that any future launcher can just start calling the
 **vertices** tick handler as and when required. In theory enough data is stored
 into `args.state.vertices` that it should be stop/startable without too much pain.
+
+
+Files
+-----
+
+All game files - code, sprites, fonts et al - are kept under `mygame\vertices`, to
+avoid potential filename clashes. The only thing required in the normal `mygame\app`
+folder is our `main.rb`, which requires all the actual code and calls into the 
+`Vertices` tick handler.
