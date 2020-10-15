@@ -243,6 +243,9 @@ module Vertices
         @args.state.vertices.polygons.clear
         @polygons.clear
 
+        # Make sure to hide the counter
+        @counter.a = 0
+
         # And stop the running state
         @args.state.vertices.running = false
 

@@ -54,6 +54,11 @@ module Vertices
       # So, set the count to the new value
       @count = value
 
+      # Clear the render target; this shouldn't be necessary, but render_targets
+      # on HTML don't seem to entirely get cleared down
+      args.render_target(@path).solids << { x: 0, y: 0, w: @w, h: @h, r: 0, g: 0, b: 0, a: 0 }
+      args.render_target(@path).borders.clear
+
       # Update the text
       args.render_target(@path).labels << {
         x: 10, y: 128,
