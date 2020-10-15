@@ -17,7 +17,10 @@ module Ahnlak
     def serialize
 
       vars = { 'Class' => self.class.name }
-      instance_variables.each { |var| vars[var] = instance_variable_get(var) }
+      instance_variables.each do |var|
+        next if @serializable_excludes && @serializable_excludes.include?(var.to_s) 
+        vars[var] = instance_variable_get(var)
+      end
       vars
 
     end
@@ -28,6 +31,12 @@ module Ahnlak
     end
     def to_s
       serialize.to_s
+    end
+
+    # We can also choose to explicitely exclude certain instance variables
+    def serializable_without(varname)
+      @serializable_excludes ||= []
+      @serializable_excludes << varname
     end
 
   end

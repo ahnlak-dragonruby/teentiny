@@ -25,6 +25,9 @@ module Vertices
       @radius = radius
       @vertices = vertices
 
+      # Make sure we don't output args when we serialize
+      serializable_without('@args')
+
       # Set some colour defaults
       colourable(55 + 200.randomize(:ratio), 155 + 100.randomize(:ratio), 55 + 200.randomize(:ratio), 255, 0)
 
