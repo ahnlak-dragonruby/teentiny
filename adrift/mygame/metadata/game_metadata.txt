@@ -1,0 +1,6 @@
+devid=ahnlak
+devtitle=ahnlak
+gameid=adrfit
+gametitle=adrift
+version=0.0.1
+icon=metadata/icon.png
