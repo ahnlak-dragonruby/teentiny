@@ -3,15 +3,11 @@ MiniGameJam
 
 These are all minigames developed as part of the impending TeenyTiny DragonRuby MiniGameJam.
 
-They are all developed using version 1.25 of DragonRuby, but in theory should be compatible
-with other versions :-)
+They are all developed using version 1.27 of DragonRuby, but in theory should be compatible
+with later versions :-)
 
 
 Complete Games
---------------
-
-
-In Development
 --------------
 
 **vertices** is a 20 second true minigame, where you click the shape with the fewest edges.
@@ -27,3 +23,14 @@ whose asset packs are a fantastic resource.
 
 The music comes from [Subspace Audio](https://juhanijunkala.com/), via 
 [OpenGameArg.org](https://opengameart.org/content/5-chiptunes-action)
+
+
+In Development
+--------------
+
+**adrift** is a simple 'stay on the screen' game. Your spaceship is adrift,
+with an increasingly broken engine. Every time you fire it, it increases in
+power.
+
+The aim of the game is simple; keep your spaceship on the screen. How long can
+you last?
