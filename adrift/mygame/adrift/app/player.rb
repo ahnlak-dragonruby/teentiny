@@ -7,11 +7,14 @@ module Adrift
 
   class Player
 
+    THRUST_DURATION=50
+
     # Make it serializable
     include Ahnlak::MixinSerializable
 
     # And set the attributes
     attr_writer :args
+    attr_reader :fired
     attr_sprite
 
     # Constructor, where we load up what we'll need
@@ -26,9 +29,12 @@ module Adrift
 
       # Set up our base parameters
       @turn_speed = 4
-      @thrust = 5
       @vector_x = 0
       @vector_y = 0
+      @delta_v = 0
+      @peak_velocity = 0
+      @target_velocity = 0
+      @fired = false
 
       # The size is set to the basic size of the player ship.
       @w = 64
@@ -52,20 +58,20 @@ module Adrift
     # and activating an appropriate noise and graphic for the engine too
     def thrust(force=-1)
 
-      # If a force was supplied, use that
-      @thrust = force if force.positive?
-
-      # Work out our current velocity
-      velocity = @vector_x ** 2 + @vector_y ** 2
-
-      # So, apply the current thrust in the direction we're facing
-      until (@vector_x ** 2 + @vector_y ** 2) > velocity
-        @vector_x += @angle.vector_x(@thrust)
-        @vector_y += @angle.vector_y(@thrust)
+      # If a force was supplied, use that as an absolute
+      if force.positive?
+        @peak_velocity = force
+        @vector_x = 0
+        @vector_y = 0
       end
 
-      # And increase the thrust power :-)
-      @thrust *= 1.1
+      # So, apply the current thrust in the direction we're facing
+      @target_velocity = @peak_velocity * 1.35
+      @delta_v = @target_velocity / THRUST_DURATION
+
+      # Set the thrusting counter to cycle through the graphics
+      @thrusting = THRUST_DURATION
+      @fired = true
 
     end
 
@@ -89,9 +95,29 @@ module Adrift
 
       end
 
+      # Apply any current thrust
+      if @thrusting.positive?
+
+        # The delta modifies the vectors
+        @vector_x += @angle.vector_x(@delta_v)
+        @vector_y += @angle.vector_y(@delta_v)
+
+        # And count the thrust down
+        @thrusting -= 1
+
+      end
+
       # And then add in our current vector
       @x += @vector_x
       @y += @vector_y
+
+      # We keep on thrusting until we exceed our previous peak
+      velocity = Math::sqrt(@vector_x ** 2 + @vector_y ** 2)
+      if velocity < @target_velocity && @thrusting.zero?
+        @thrusting = THRUST_DURATION
+        @fired = true
+      end
+      @peak_velocity = velocity if velocity > @peak_velocity
 
     end
 
@@ -111,7 +137,7 @@ module Adrift
       # angle_anchor_x, angle_anchor_y,
       # source_x, source_y, source_w, source_h
 
-      # For now, just drop in the player ship, centered on the ship
+      # Firstly drop in the player ship, centered on the ship
       ffi_draw.draw_sprite_3(
         @x - (@w / 2), @y - (@h / 2), @w, @h,
         'adrift/sprites/player-ship.png',
@@ -122,6 +148,28 @@ module Adrift
         0.5, 0.5,
         nil, nil, nil, nil
       )
+
+      # If we're thrusting, we add on the plume from the engines...
+      if @thrusting.positive?
+
+        # Draw the flame
+        ffi_draw.draw_sprite_3(
+          @x - 64 - @angle.vector_x(90), 
+          @y - 64 - @angle.vector_y(90),
+          128, 128, 'adrift/sprites/thrust.png', @angle + 90,
+          128, nil, nil, nil,
+          nil, nil,
+          nil, nil, nil, nil,
+          0.5, 0.5,
+          (@thrusting / 8).to_i * 128, (@thrusting % 8).to_i * 128,
+          128, 128
+        )
+
+      end
+
+      # Lastly, clear the firing flag; we know this function happens late
+      # in the pipeline so it's a safe place to clear it
+      @fired = false
 
     end
 

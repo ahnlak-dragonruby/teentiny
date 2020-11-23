@@ -25,6 +25,11 @@ module Adrift
       @audio_handler = Ahnlak::ClassAudio.new
       @audio_handler.play('adrift/sounds/ObservingTheStar.ogg')
 
+      # And a counter to display the passage of time
+      @counter = Counter.new(args)
+      @counter.x = @args.grid.center_x - (@counter.w / 2)
+      @counter.y = 710 - @counter.h
+
       # And load up our sprites
       load_sprites
 
@@ -193,6 +198,26 @@ module Adrift
       # Now update the player object
       @player.update
 
+      # Play the engines if they engines have fired
+      @audio_handler.play('adrift/sounds/thrust.wav') if @player.fired
+
+
+      # End-state check now; is the player still on the screen?
+      unless @player.intersect_rect?(@args.grid)
+
+        # Save the current counter
+        time = (@args.tick_count - @counter.start_tick) / 60
+        if time < 20
+          @prompt[2].text = "You only lasted #{time.round(2)} seconds - can you do better?!"
+        else
+          @prompt[2].text = "Awesome! You made it to #{time.round(2)} seconds!"
+        end
+
+        # And we're no longer running
+        @args.state.adrift.running = false
+
+      end
+
     end
 
     def update_title
@@ -208,7 +233,7 @@ module Adrift
         reset
 
         # Set the timer running from this point
-        @args.state.adrift.start_tick = @args.tick_count
+        @counter.start_tick = @args.tick_count
 
         # And flag ourselves as running
         @args.state.adrift.running = true
@@ -244,6 +269,9 @@ module Adrift
 
       # Send the player object to the screen
       @args.outputs.primitives << @player
+
+      # And the counter
+      @args.outputs.primitives << @counter
 
     end
 

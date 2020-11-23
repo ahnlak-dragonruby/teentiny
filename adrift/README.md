@@ -3,7 +3,7 @@ adrift
 
 **adrift** is a simple 'stay on the screen' game. Your spaceship is adrift,
 with an increasingly broken engine. Every time you fire it, it increases in
-power.
+power and can be ... sticky.
 
 The aim of the game is simple; keep your spaceship on the screen. How long can
 you last?
